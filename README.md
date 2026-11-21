@@ -56,6 +56,8 @@ Screenshots use generated accounts, files, terminal output, and resource reading
 
 ## Documentation
 
+- [Standalone Murashka Helper Tool integration](docs/helper-tool.md)
+
 - [Telegram, security reviews and remote desktops](docs/host-operations.md)
 
 - [Installation, HTTPS and upgrades](docs/install.md)

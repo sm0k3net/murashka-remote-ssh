@@ -15,3 +15,5 @@ remote/static/vendor/novnc/
 telegram.json
 .telegram.new
 site/assets/
+helper-token
+helper.sock

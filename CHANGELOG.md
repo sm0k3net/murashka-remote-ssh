@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Added a local Unix socket broker for the standalone Murashka Helper Tool.
+- Broker access requires a private token and explicit host IDs. It issues only guest workspaces and revokes only its own grants.
+
 ## 0.2.0
 
 - Optional Telegram control for listing hosts, viewing sampled status, creating temporary host links and revoking bot-issued access.

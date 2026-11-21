@@ -1,5 +1,6 @@
 """Local administration and gateway service."""
 import argparse
+import asyncio
 import json
 import os
 import ssl
@@ -7,6 +8,7 @@ import subprocess
 import time
 
 import telegram_bot
+import helper_broker
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -70,6 +72,10 @@ def parser():
     commands.add_parser('serve', help='Run the browser gateway on IPv4 loopback')
     commands.add_parser('telegram-setup', help='Configure a dedicated Telegram bot and private operator')
     commands.add_parser('telegram', help='Start the optional Telegram long-polling process')
+    commands.add_parser('helper-init', help='Generate a private Helper Tool broker token')
+    broker = commands.add_parser('helper-broker', help='Start the local Helper Tool broker')
+    broker.add_argument('--socket', type=Path, help='Unix socket path (default: helper.sock in Remote SSH state)')
+    broker.add_argument('--allow-host', type=int, required=True, action='append', help='Allow this host ID; repeat for each host')
     commands.add_parser('hosts', help='List registered SSH hosts')
     commands.add_parser('grants', help='List current workspace IDs (no credentials)')
     grant = commands.add_parser('grant', help='Create a time-limited browser link and password')
@@ -97,6 +103,15 @@ def main():
         if args.command == 'telegram':
             try:
                 return telegram_bot.run(state, origin)
+            except KeyboardInterrupt:
+                return
+        if args.command == 'helper-init':
+            return helper_broker.initialize(state)
+        if args.command == 'helper-broker':
+            try:
+                return asyncio.run(helper_broker.serve(
+                    state, origin, args.socket.expanduser().absolute() if args.socket else state / 'helper.sock',
+                    args.allow_host))
             except KeyboardInterrupt:
                 return
         if args.command == 'serve':

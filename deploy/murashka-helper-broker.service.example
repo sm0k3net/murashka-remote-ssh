@@ -1,0 +1,13 @@
+[Unit]
+Description=Murashka Remote SSH Helper Tool broker
+After=murashka-remote-ssh.service
+[Service]
+Type=simple
+WorkingDirectory=%h/murashka-remote-ssh
+ExecStart=%h/murashka-remote-ssh/murashka helper-broker --allow-host 1
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+UMask=0077
+[Install]
+WantedBy=default.target

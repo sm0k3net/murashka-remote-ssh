@@ -23,6 +23,7 @@ jobs:
         run: |
           mkdir -p site/assets
           cp docs/screenshots/terminal.png docs/screenshots/files.png docs/screenshots/monitoring.png docs/screenshots/security.png docs/screenshots/desktop.png site/assets/
+          cp -R helper-tool site/helper-tool
           test -s site/index.html
           node --check site/site.js
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
