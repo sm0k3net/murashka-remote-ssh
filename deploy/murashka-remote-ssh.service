@@ -1,0 +1,15 @@
+[Unit]
+Description=Murashka Remote SSH
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/murashka-remote-ssh
+ExecStart=%h/murashka-remote-ssh/murashka serve
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

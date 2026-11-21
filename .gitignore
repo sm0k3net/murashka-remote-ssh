@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+*.sqlite*
+*.pem
+*.key
+*.crt
+fernet-key
+config.local.json
+connection.json
