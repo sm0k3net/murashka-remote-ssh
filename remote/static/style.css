@@ -96,3 +96,6 @@ textarea.editor { width: 100%; min-height: 300px; }
   header { padding: .75rem; }
   #expires { display:none; }
 }
+.report-card { margin-block: .75rem; }
+#desktop-options .tools,.report-card .tools { margin-top: .85rem; }
+.report-card details { margin-block: .5rem; }

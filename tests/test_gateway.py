@@ -1,5 +1,8 @@
 """Exercise the public release against ephemeral authenticated SSH endpoints."""
 import asyncio
+import json
+import re
+import time
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +12,7 @@ from aiohttp.test_utils import TestClient, TestServer
 from cryptography.fernet import Fernet
 
 from app import COOKIE, Gateway
+from telegram_bot import Telegram
 
 
 class SSHServer(asyncssh.SSHServer):
@@ -40,6 +44,8 @@ class GatewayTests(unittest.IsolatedAsyncioTestCase):
         self.client = TestClient(TestServer(self.gateway.application()))
         await self.client.start_server()
         self.origin = {'Origin': self.gateway.base()}
+        self.review_hash = 'a' * 64
+        self.desktop_installs = []
         self.hosts = []
         self.folders = []
         for index in range(2):
@@ -63,6 +69,23 @@ class GatewayTests(unittest.IsolatedAsyncioTestCase):
         await server.wait_closed()
 
     async def shell(self, process):
+        if process.command == 'id -u':
+            process.stdout.write('1000\n')
+            process.exit(0)
+            return
+        if process.command and 'Provision or manage only' in process.command:
+            fixture = json.loads(await process.stdin.read())
+            self.desktop_installs.append(fixture['action'])
+            process.stdout.write(json.dumps({'installed': fixture['action'] != 'remove', 'port': 5901}))
+            process.exit(0)
+            return
+        if process.command and 'Bounded read-only Linux audit' in process.command:
+            process.stdout.write(json.dumps({
+                'uid': 1000, 'config_hashes': {'/etc/ssh/sshd_config': self.review_hash},
+                'coverage': ['fixture'], 'findings': [{'severity': 'info', 'title': '<unsafe>', 'detail': 'test'}],
+            }))
+            process.exit(0)
+            return
         if process.command and process.command.startswith('python3 -c '):
             process.stdout.write('{"cpu": 8.5, "disk": 23, "top": []}')
             process.exit(0)
@@ -161,6 +184,98 @@ class GatewayTests(unittest.IsolatedAsyncioTestCase):
                 finally:
                     writer.close()
                 await self.post('/api/forwards', dict(action='delete', id=profile['id']), headers)
+
+
+
+    async def test_owner_review_baseline_report_and_desktop_lifecycle(self):
+        _, headers = await self.login()
+        host = (await self.post('/api/targets', self.hosts[0], headers))['id']
+        _, guest = await self.login(host)
+        for endpoint, kind in ((f'/api/host-review/{host}', 'review'), (f'/api/desktop/{host}', 'desktop')):
+            self.assertEqual((await self.client.get(endpoint, headers=guest)).status, 403)
+            self.assertEqual((await self.client.post(endpoint, json={'action':'run'}, headers=guest)).status, 403)
+
+        async def operation(endpoint, body, kind):
+            response = await self.client.post(endpoint, json=body, headers=headers)
+            self.assertEqual(response.status, 202, await response.text())
+            task = self.gateway.host_tasks.get((host, kind))
+            if task:
+                await asyncio.wait_for(task, 5)
+            self.assertEqual(self.gateway.host_jobs[(host, kind)]['state'], 'done', self.gateway.host_jobs)
+
+        endpoint = f'/api/host-review/{host}'
+        await operation(endpoint, {'action':'run'}, 'review')
+        reports = await (await self.client.get(endpoint, headers=headers)).json()
+        latest = reports['reports'][0]['id']
+        report = await self.client.get(endpoint + '/report/' + latest, headers=headers)
+        self.assertIn('&lt;unsafe&gt;', await report.text())
+        self.assertIn('attachment', report.headers['Content-Disposition'])
+        await self.post(endpoint, {'action':'baseline','report':latest,'confirm':True}, headers)
+        self.review_hash = 'b' * 64
+        await operation(endpoint, {'action':'run'}, 'review')
+        reports = await (await self.client.get(endpoint, headers=headers)).json()
+        self.assertEqual(reports['reports'][0]['changes'], [{'path':'/etc/ssh/sshd_config', 'change':'Changed'}])
+
+        endpoint = f'/api/desktop/{host}'
+        request = {'action':'install','variant':'xfce'}
+        self.assertEqual((await self.client.post(endpoint, json=request, headers=headers)).status, 400)
+        await operation(endpoint, {**request, 'confirm':True}, 'desktop')
+        password = (await self.post(endpoint+'/credentials', {}, headers))['password']
+        self.assertRegex(password, r'^[A-Za-z0-9]{8}$')
+        self.assertNotIn(password, self.gateway.store.setting('desktop-password-' + str(host)))
+        self.assertEqual((await self.client.post(endpoint + '/credentials', json={}, headers=guest)).status, 403)
+        await operation(endpoint, {'action':'restart', 'confirm':True}, 'desktop')
+        await operation(endpoint, {'action':'remove', 'confirm':True}, 'desktop')
+        self.assertIsNone((await self.post(endpoint + '/credentials', {}, headers))['password'])
+        self.assertEqual(self.desktop_installs, ['install', 'restart', 'remove'])
+
+    async def test_browser_vnc_relays_loopback_and_checks_origin(self):
+        _, owner = await self.login()
+        host = (await self.post('/api/targets', self.hosts[0], owner))['id']
+        _, guest = await self.login(host)
+
+        async def fake_display(reader, writer):
+            try:
+                writer.write(b'RFB 003.008\n')
+                await writer.drain()
+                writer.write(await reader.readexactly(12))
+                await writer.drain()
+            finally:
+                writer.close()
+                await writer.wait_closed()
+
+        for port in (5900, 5901):
+            try:
+                listener = await asyncio.start_server(fake_display, '127.0.0.1', port)
+            except OSError:
+                continue
+            break
+        else:
+            self.skipTest('Both loopback fixture ports are in use')
+        async with listener:
+            endpoint = f'/api/desktop/{host}/ws?port={port}'
+            self.assertEqual((await self.client.get(endpoint, headers=guest)).status, 403)
+            self.assertEqual((await self.client.get(endpoint, headers={**owner,'Origin':'https://other.example'})).status, 403)
+            async with self.client.ws_connect(endpoint, headers=owner) as ws:
+                self.assertEqual((await ws.receive(timeout=3)).data, b'RFB 003.008\n')
+                await ws.send_bytes(b'RFB 003.008\n')
+                self.assertEqual((await ws.receive(timeout=3)).data, b'RFB 003.008\n')
+
+    async def test_telegram_private_access_and_revocation(self):
+        _, headers = await self.login()
+        host = (await self.post('/api/targets', self.hosts[0], headers))['id']
+        bot = Telegram(self.gateway.store, self.gateway.base(), 'unused-fixture-token', 42)
+        now = int(time.time())
+        message = {'chat':{'type':'private','id':42}, 'from':{'id':42}, 'date':now, 'text':f'/connect {host}'}
+        self.assertIsNone(bot.reply({'message':{**message, 'from':{'id':43}}}, now))
+        self.assertIsNone(bot.reply({'message':{**message, 'chat':{'type':'group','id':42}}}, now))
+        self.assertIsNone(bot.reply({'message':{**message, 'date':now-121}}, now))
+        reply = bot.reply({'message':message}, now)
+        ident = re.search(r'Revoke: /revoke (\S+)', reply)[1]
+        grant = self.gateway.store.valid_grant(ident)
+        self.assertEqual((grant['target'],grant['role']), (host,'guest'))
+        self.assertEqual(bot.reply({'message':{**message,'text':'/revoke '+ident}}, now), 'Workspace revoked.')
+        self.assertIsNone(self.gateway.store.valid_grant(ident))
 
 
 if __name__ == '__main__':

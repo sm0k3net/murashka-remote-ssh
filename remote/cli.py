@@ -5,6 +5,8 @@ import os
 import ssl
 import subprocess
 import time
+
+import telegram_bot
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -66,6 +68,8 @@ def parser():
     configure.add_argument('--port', type=int, default=8765)
     configure.add_argument('--local-tls', action='store_true', help='Generate a certificate for localhost evaluation')
     commands.add_parser('serve', help='Run the browser gateway on IPv4 loopback')
+    commands.add_parser('telegram-setup', help='Configure a dedicated Telegram bot and private operator')
+    commands.add_parser('telegram', help='Start the optional Telegram long-polling process')
     commands.add_parser('hosts', help='List registered SSH hosts')
     commands.add_parser('grants', help='List current workspace IDs (no credentials)')
     grant = commands.add_parser('grant', help='Create a time-limited browser link and password')
@@ -88,6 +92,13 @@ def main():
             raise ValueError('State directory must be private (chmod 700).')
         config = json.loads((state / 'config.json').read_text())
         origin = origin_value(config['origin'])
+        if args.command == 'telegram-setup':
+            return telegram_bot.setup(state)
+        if args.command == 'telegram':
+            try:
+                return telegram_bot.run(state, origin)
+            except KeyboardInterrupt:
+                return
         if args.command == 'serve':
             context = None
             if config['local_tls']:

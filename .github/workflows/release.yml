@@ -19,7 +19,7 @@ jobs:
           python-version: '3.12'
       - run: ./setup.sh
       - run: PYTHONPATH=remote .venv/bin/python -m unittest discover -s tests -v
-      - run: node --check remote/static/workspace.js
+      - run: for script in remote/static/*.js; do node --check "$script" || exit 1; done
   publish:
     needs: validate
     runs-on: ubuntu-24.04

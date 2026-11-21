@@ -10,3 +10,8 @@ __pycache__/
 fernet-key
 config.local.json
 connection.json
+
+remote/static/vendor/novnc/
+telegram.json
+.telegram.new
+site/assets/

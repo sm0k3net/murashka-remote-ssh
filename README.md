@@ -12,9 +12,12 @@ A self-hosted browser workspace for your SSH servers. Open independent terminals
 | Two-pane SFTP | Browse two directories side by side, edit UTF-8 files, upload or download a file, or drag files and folders between hosts. |
 | Host monitoring | Pull CPU, memory, disk, and process statistics from a Linux host over the existing SSH connection. |
 | SSH tunnels | Reach a private web application or database through a saved local tunnel, or use a SOCKS5 TCP listener. Reverse forwarding is available with an explicit server-side setting. |
+| Telegram control | List hosts, inspect the latest sampled status, receive an expiring host-scoped link, and revoke bot-issued access from a private chat. |
+| Security reviews | Inspect Linux accounts, listeners, services, SSH settings, APT update candidates and file fingerprints. Download an HTML report. |
+| Remote desktops | Install Openbox or Xfce on a supported Debian or Ubuntu host and open the VNC session in your browser. |
 | Temporary access | Issue a 30-minute, 2-hour, or 12-hour workspace link. Guest links grant shell and SFTP access to one saved SSH account. |
 
-Murashka Remote SSH is intended for a single trusted operator and hosts they administer. The first release manages hosts the gateway can reach by SSH. It needs no Telegram account, cloud service, or AI provider.
+Murashka Remote SSH is intended for a single trusted operator and hosts they administer. The first release manages hosts the gateway can reach by SSH. Telegram is opt-in. The gateway and browser workspace work independently.
 
 ## Quick start
 
@@ -43,9 +46,15 @@ Screenshots use generated accounts, files, terminal output, and resource reading
 | --- | --- |
 | ![Two SFTP panes with staging and build directories](docs/screenshots/files.png) | ![Monitoring cards and the process table](docs/screenshots/monitoring.png) |
 
+| Security review | Remote desktop setup |
+| --- | --- |
+| ![Read-only review results and report controls](docs/screenshots/security.png) | ![Managed desktop profiles and VNC controls](docs/screenshots/desktop.png) |
+
 ![Saved local and SOCKS tunnel profiles](docs/screenshots/tunnels.png)
 
 ## Documentation
+
+- [Telegram, security reviews and remote desktops](docs/host-operations.md)
 
 - [Installation, HTTPS and upgrades](docs/install.md)
 - [Usage examples and operational limits](docs/usage.md)

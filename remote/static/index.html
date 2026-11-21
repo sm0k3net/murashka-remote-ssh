@@ -9,7 +9,7 @@
   <script defer src="/static/vendor/xterm.js"></script>
   <script defer src="/static/vendor/addon-fit.js"></script>
   <script defer src="/static/vendor/addon-search.js"></script>
-  <script defer src="/static/workspace.js"></script>
+  <script defer src="/static/workspace.js"></script><script defer src="/static/host-features.js"></script>
 </head>
 <body>
   <main id="login" class="login">
@@ -25,7 +25,7 @@
   <main id="workspace" hidden>
     <header><div class="brand"><span>M</span> Murashka Remote SSH</div><div class="header-tools"><span id="expires"></span><button id="lock">Lock</button></div></header>
     <div class="layout">
-      <aside><div class="sidebar-head"><h2>Hosts</h2><button id="add-host" title="Add host">+ Add</button></div><div id="hosts"></div><nav id="navigation" aria-label="Workspace views"><button data-view="terminal" aria-current="page">Terminal</button><button data-view="files">Files</button><button data-view="monitoring">Monitoring</button><button data-view="tunnels">Tunnels</button></nav></aside>
+      <aside><div class="sidebar-head"><h2>Hosts</h2><button id="add-host" title="Add host">+ Add</button></div><div id="hosts"></div><nav id="navigation" aria-label="Workspace views"><button data-view="terminal" aria-current="page">Terminal</button><button data-view="files">Files</button><button data-view="monitoring">Monitoring</button><button data-view="tunnels">Tunnels</button><button data-view="security">Security</button><button data-view="desktop">Desktop</button></nav></aside>
       <div class="content">
         <section id="terminal" class="view">
           <div class="view-head"><div><p class="kicker">WORKSPACE</p><h1>Terminal</h1></div><div class="tools"><button id="find">Find output</button><button id="split" aria-pressed="false">Split</button><button id="new-terminal" class="primary">+ Terminal</button></div></div>
@@ -47,6 +47,16 @@
           <div class="view-head"><div><p class="kicker">SSH FORWARDING</p><h1>Tunnels</h1></div><div class="tools"><button id="tunnel-refresh">Refresh</button><button id="add-tunnel" class="primary">+ Add tunnel</button></div></div>
           <p class="muted">Listeners use loopback. Use a computer bridge to reach local and SOCKS listeners from your computer.</p>
           <div id="tunnel-list" class="cards"></div>
+        </section>
+        <section id="security" class="view" hidden>
+          <div class="view-head"><div><p class="kicker">HOST HYGIENE</p><h1>Security review</h1></div><div class="tools"><button id="review-refresh">Refresh</button><button id="run-review" class="primary">Run read-only review</button></div></div>
+          <p class="muted">Review SSH settings, accounts, services, listeners, pending OS updates and selected configuration fingerprints. Findings depend on the access available to this SSH account.</p>
+          <div id="review-results"></div>
+        </section>
+        <section id="desktop" class="view" hidden>
+          <div class="view-head"><div><p class="kicker">GRAPHICAL ACCESS</p><h1>Remote desktop</h1></div><button id="desktop-refresh">Refresh</button></div>
+          <p class="muted">Install Openbox or Xfce with a managed loopback VNC service, or open an existing loopback VNC desktop.</p>
+          <div id="desktop-options"></div>
         </section>
       </div>
     </div>

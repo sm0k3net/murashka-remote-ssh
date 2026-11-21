@@ -12,7 +12,7 @@ Use the account that will operate the gateway. Keep this checkout and its state 
     cd ~/murashka-remote-ssh
     ./setup.sh
 
-The setup script creates a virtual environment and installs Python dependencies. It does not create system accounts, modify SSH configuration, or install a reverse proxy.
+The setup script creates a virtual environment, installs Python dependencies and unpacks the bundled browser VNC client. It does not create system accounts, modify SSH configuration, or install a reverse proxy.
 
 ## 2. Choose HTTPS
 
@@ -71,3 +71,7 @@ Default state is ~/.local/state/murashka-remote-ssh. Use the global --state argu
 The SQLite database contains encrypted SSH credentials and operational metadata. The fernet-key file can decrypt saved credentials and must be protected as carefully as the database itself. Stop the service and copy the complete directory to an encrypted backup. Restore it only under the intended gateway account, with private file permissions. When migrating, review the origin and revoke existing grants if their access links should stop working.
 
 For upgrades, stop the gateway, take the backup above, check the [changelog](../CHANGELOG.md), switch your clean checkout to the desired release tag, and rerun ./setup.sh. Restart the service and retest an SSH connection. A software rollback may also require restoring the pre-upgrade state. Keep source code and state on separate paths.
+
+## Optional host operations
+
+After updating to 0.2 or later, rerun ./setup.sh before starting the gateway. For Telegram setup, read-only host reviews and graphical access, see [host operations](host-operations.md).

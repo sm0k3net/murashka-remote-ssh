@@ -1,0 +1,12 @@
+[Unit]
+Description=Murashka Remote SSH Telegram control
+After=network-online.target
+[Service]
+WorkingDirectory=%h/murashka-remote-ssh
+ExecStart=%h/murashka-remote-ssh/murashka telegram
+Restart=on-failure
+RestartSec=15
+UMask=0077
+NoNewPrivileges=true
+[Install]
+WantedBy=default.target

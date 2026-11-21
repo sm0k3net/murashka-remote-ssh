@@ -105,7 +105,7 @@ async function loadSession() {
   }
   $('add-host').hidden = !owner();
   $('copy-jobs').hidden = !owner();
-  $('navigation').querySelector('[data-view=tunnels]').hidden = !owner();
+  for (const view of ['tunnels', 'security', 'desktop']) $('navigation').querySelector('[data-view='+view+']').hidden = !owner();
   $('hosts').replaceChildren();
   for (const host of hosts) {
     const row = node('div', undefined, 'host-row');
@@ -123,7 +123,7 @@ async function loadSession() {
   if (!hosts.length) $('hosts').append(node('p', 'Add your first SSH host.', 'muted'));
   $('login').hidden = true;
   $('workspace').hidden = false;
-  showView(owner() ? state.view : state.view === 'tunnels' ? 'terminal' : state.view);
+  showView(!owner() && ['tunnels', 'security', 'desktop'].includes(state.view) ? 'terminal' : state.view);
 }
 function renderSelection() {
   for (const item of $('hosts').querySelectorAll('.host')) item.setAttribute('aria-pressed', String(Number(item.dataset.id) === state.host));
@@ -131,6 +131,8 @@ function renderSelection() {
   $('add-tunnel').disabled = !state.host;
   $('metrics-refresh').disabled = !state.host;
   if (state.view === 'monitoring') refreshMetrics();
+  if (state.view === 'security') refreshReviews();
+  if (state.view === 'desktop') refreshDesktop();
 }
 function hostDetails(host) {
   const body = node('div');

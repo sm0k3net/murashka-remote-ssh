@@ -20,12 +20,13 @@ from copies import FileJobs
 from db import Store, digest, password_hash
 from files import Workspace
 from forwards import Forwards
+from host_features import HostFeatures
 
 COOKIE = '__Host-murashka-remote'
 ROOT = Path(__file__).resolve().parent
 LOG = logging.getLogger(__name__)
 
-class Gateway(Workspace, FileJobs, Forwards):
+class Gateway(Workspace, FileJobs, Forwards, HostFeatures):
 
     def csrf(self, token):
         return hmac.new(self.key, token.encode(), hashlib.sha256).hexdigest()
@@ -218,6 +219,7 @@ class Gateway(Workspace, FileJobs, Forwards):
         self.metrics_locks = collections.defaultdict(asyncio.Lock)
         self.copy_init()
         self.forwards_init()
+        self.host_features_init()
 
     def base(self):
         return self.origin
@@ -271,6 +273,10 @@ class Gateway(Workspace, FileJobs, Forwards):
         self.auth(request, True, True)
         host = int(request.match_info['id'])
         self.store.target(host)
+        if self.store.setting('desktop-password-' + str(host)):
+            raise web.HTTPConflict(text='Remove the managed desktop on this host before removing the host.')
+        if any(target == host for target, kind in self.host_tasks):
+            raise web.HTTPConflict(text='Wait for the host operation to finish first.')
         async with self.forward_lock:
             profiles = self.forward_profiles()
             for ident in [i for i, p in profiles.items() if p['host'] == host]:
@@ -282,6 +288,8 @@ class Gateway(Workspace, FileJobs, Forwards):
                 self.store.db.execute('DELETE FROM targets WHERE id=?', (host,))
                 self.store.db.execute("UPDATE grants SET revoked=1 WHERE role='guest' AND target=?", (host,))
                 self.store.db.execute('DELETE FROM metrics WHERE target=?', (host,))
+                self.store.db.execute('DELETE FROM host_reviews WHERE target=?', (host,))
+                self.store.db.execute('DELETE FROM settings WHERE key IN (?,?)', ('review-baseline-' + str(host), 'desktop-password-' + str(host)))
             conn = self.connections.pop(host, None)
             if conn:
                 conn.close()
@@ -333,7 +341,7 @@ class Gateway(Workspace, FileJobs, Forwards):
         self.workers = [asyncio.create_task(self.forward_worker()), asyncio.create_task(self.sweep())]
 
     async def stop(self, app):
-        tasks = [*self.workers, *self.transfer_tasks.values()]
+        tasks = [*self.workers, *self.transfer_tasks.values(), *self.host_tasks.values()]
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
@@ -382,6 +390,7 @@ class Gateway(Workspace, FileJobs, Forwards):
         app.router.add_get('/api/copies', self.copies)
         app.router.add_post('/api/copies', self.copies)
         self.forward_routes(app)
+        self.feature_routes(app)
         app.on_startup.append(self.start)
         app.on_cleanup.append(self.stop)
         return app

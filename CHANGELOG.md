@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Optional Telegram control for listing hosts, viewing sampled status, creating temporary host links and revoking bot-issued access.
+- Read-only Linux host reviews with encrypted reports, HTML download, coverage details and an operator-approved configuration baseline.
+- Managed Debian and Ubuntu graphical desktops with Openbox or Xfce, browser access, restart and removal.
+- Public project site source and English guides with worked examples.
+
 ## 0.1.0
 
 First public release of Murashka Remote SSH.

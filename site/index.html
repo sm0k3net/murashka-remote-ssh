@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Murashka Remote SSH is an open-source browser workspace for SSH terminals, SFTP, Linux host reviews, remote desktops, and SSH tunnels.">
+  <meta name="theme-color" content="#131b19">
+  <title>Murashka Remote SSH — Self-hosted server workspace</title>
+  <link rel="icon" type="image/svg+xml" href="mark.svg">
+  <link rel="stylesheet" href="style.css">
+  <script src="site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="identity" href="./"><img src="mark.svg" width="36" height="36" alt=""><span>Murashka <b>Remote SSH</b></span></a>
+      <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#examples">Examples</a><a href="#install">Install</a></nav>
+      <a class="top-github" href="https://github.com/sm0k3net/murashka-remote-ssh">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="label"><span></span> SELF-HOSTED · APACHE-2.0</p>
+        <h1>Your servers.<br>One workspace.</h1>
+        <p class="intro">Open a shell, move files, review a Linux host, or launch a remote desktop from your browser. Run the gateway on infrastructure you control.</p>
+        <div class="actions"><a class="button primary" href="#install">Get started <span aria-hidden="true">↓</span></a><a class="button secondary" href="https://github.com/sm0k3net/murashka-remote-ssh/releases/tag/v0.2.0">View v0.2.0 <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <figure class="product-shot">
+        <div class="chrome"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>WORKSPACE / STAGING</span></div>
+        <img src="assets/terminal.png" alt="Murashka Remote SSH with two shell sessions side by side" width="1280" height="920" fetchpriority="high">
+        <figcaption>Two independent shell sessions on example hosts.</figcaption>
+      </figure>
+    </section>
+    <section class="band" id="features">
+      <div class="wrap">
+        <p class="label">FEATURES</p><h2>Keep everyday server work close.</h2>
+        <div class="features">
+          <article><span class="glyph" aria-hidden="true">›_</span><h3>Browser SSH</h3><p>Open independent shells in split panes, find text in terminal output and share time-limited access to a single host.</p></article>
+          <article><span class="glyph" aria-hidden="true">⇄</span><h3>Two-pane files</h3><p>Browse, edit and copy files between hosts over SFTP. Queue a transfer and follow its status.</p></article>
+          <article><span class="glyph" aria-hidden="true">◫</span><h3>Linux monitoring</h3><p>Sample CPU, memory, disk space and busy processes through the SSH connection.</p></article>
+          <article><span class="glyph" aria-hidden="true">✓</span><h3>Security reviews</h3><p>Inspect accounts, SSH policy, services and update candidates. Save a baseline and download HTML reports.</p></article>
+          <article><span class="glyph" aria-hidden="true">▣</span><h3>Remote desktop</h3><p>Install Openbox or Xfce on a supported server, then open its private VNC display in the browser.</p></article>
+          <article><span class="glyph" aria-hidden="true">↗</span><h3>Telegram control</h3><p>List hosts, check their last resource samples, and issue or revoke short-lived guest links from a private chat.</p></article>
+          <article><span class="glyph" aria-hidden="true">↪</span><h3>SSH tunnels</h3><p>Reach a private service with a local or SOCKS5 listener. Enable reverse forwarding when your SSH policy permits it.</p></article>
+        </div>
+      </div>
+    </section>
+    <section class="wrap examples" id="examples">
+      <p class="label">EXAMPLES</p><h2>From a task to a working session.</h2>
+      <div class="example-grid">
+        <article><h3>Inspect staging from your phone</h3><p>Send <code>/hosts</code> to your bot, then <code>/connect 1</code>. Open the returned link and enter its password to access that host for 30 minutes.</p></article>
+        <article><h3>Review a server after a change</h3><p>Run a read-only review before and after an SSH policy change. Compare the selected configuration fingerprints against the baseline you accepted.</p></article>
+        <article><h3>Open an app that needs a desktop</h3><p>On a supported Debian or Ubuntu VM, authorize Openbox or Xfce installation. Open the loopback VNC session through your browser.</p></article>
+        <article><h3>Copy a release to another host</h3><p>Choose the build host on the left and staging on the right. Drag a release archive to the destination, then confirm the copy.</p></article>
+      </div>
+      <a class="text-link" href="https://github.com/sm0k3net/murashka-remote-ssh/blob/v0.2.0/docs/host-operations.md">Read the host operations guide <span aria-hidden="true">↗</span></a>
+      <div class="mini-shots">
+        <figure><img src="assets/files.png" width="1280" height="920" alt="The two-pane staging and build file browser" loading="lazy"><figcaption>Copy files between two SSH hosts.</figcaption></figure>
+        <figure><img src="assets/monitoring.png" width="1280" height="920" alt="Linux resource and process dashboard" loading="lazy"><figcaption>Read the latest Linux resource sample.</figcaption></figure>
+        <figure><img src="assets/security.png" width="1280" height="920" alt="Read-only review results and report controls" loading="lazy"><figcaption>Review observations and download an HTML report.</figcaption></figure>
+        <figure><img src="assets/desktop.png" width="1280" height="920" alt="Remote desktop profiles and VNC access controls" loading="lazy"><figcaption>Choose and provision a managed desktop.</figcaption></figure>
+      </div>
+    </section>
+    <section id="install" class="band install">
+      <div class="wrap install-grid">
+        <div><p class="label">QUICK START</p><h2>Try it on Linux.</h2><p>With Python 3.12+, venv, Git and OpenSSL installed, start a localhost evaluation. Use a trusted HTTPS reverse proxy for remote access.</p><a class="text-link" href="https://github.com/sm0k3net/murashka-remote-ssh/blob/v0.2.0/docs/install.md">Installation and HTTPS guide <span aria-hidden="true">↗</span></a></div>
+        <div class="code-block"><div class="code-head"><strong>Installation · v0.2.0</strong><button id="copy-command" type="button" hidden>Copy commands</button></div><pre><code id="commands">git clone --branch v0.2.0 https://github.com/sm0k3net/murashka-remote-ssh.git
+cd murashka-remote-ssh
+./setup.sh
+./murashka init --local-tls
+./murashka serve</code></pre><p>In a second terminal run <code>./murashka grant</code>, then open the generated URL and enter the password.</p><span id="copy-result" role="status"></span></div>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap foot"><span>Murashka Remote SSH · Apache-2.0</span><div><a href="https://github.com/sm0k3net/murashka-remote-ssh">Source</a><a href="https://github.com/sm0k3net/murashka-remote-ssh/issues">Issues</a><a href="https://github.com/sm0k3net/murashka-remote-ssh/security/policy">Security</a></div></footer>
+</body>
+</html>
