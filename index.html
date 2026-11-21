@@ -1,0 +1,11 @@
+---
+layout: null
+---
+{%- capture landing -%}{% include_relative site/index.html %}{%- endcapture -%}
+{{- landing
+  | replace: 'href="mark.svg"', 'href="site/mark.svg"'
+  | replace: 'href="style.css"', 'href="site/style.css"'
+  | replace: 'src="site.js"', 'src="site/site.js"'
+  | replace: 'src="mark.svg"', 'src="site/mark.svg"'
+  | replace: 'src="assets/', 'src="docs/screenshots/'
+-}}

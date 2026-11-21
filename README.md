@@ -2,6 +2,8 @@
 
 A self-hosted browser workspace for your SSH servers. Open independent terminals, move files between hosts, inspect resource usage, and manage SSH tunnels from one workspace.
 
+[Project website](https://sm0k3net.github.io/murashka-remote-ssh/)
+
 ![Murashka Remote SSH showing two side-by-side terminal sessions](docs/screenshots/terminal.png)
 
 ## What you can do

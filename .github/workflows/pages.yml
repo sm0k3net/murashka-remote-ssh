@@ -1,11 +1,5 @@
 name: Publish project website
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'site/**'
-      - 'docs/screenshots/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -34,6 +28,9 @@ jobs:
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: site
+          name: pages-${{ github.run_attempt }}
       - name: Deploy to GitHub Pages
         id: publish
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+        with:
+          artifact_name: pages-${{ github.run_attempt }}

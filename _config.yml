@@ -1,0 +1,19 @@
+# Files published by GitHub Pages when its source is main / (root).
+exclude:
+  - .github
+  - .gitignore
+  - CHANGELOG.md
+  - CONTRIBUTING.md
+  - LICENSE
+  - README.md
+  - SECURITY.md
+  - THIRD_PARTY_NOTICES.md
+  - VERSION
+  - deploy
+  - docs/*.md
+  - murashka
+  - remote
+  - setup.sh
+  - site/README.md
+  - site/index.html
+  - tests

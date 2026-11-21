@@ -1,8 +1,10 @@
 # Project website
 
-The website is static HTML, CSS and JavaScript. The GitHub Pages workflow publishes only this directory and the selected synthetic screenshots.
+The website is static HTML, CSS and JavaScript. Its source is site/index.html. The root Jekyll entry point uses that same source and rewrites local asset paths to match the repository layout.
 
-Repository owners can enable it in **Settings → Pages → Build and deployment → Source → GitHub Actions**. Run **Publish project website** from the Actions tab to deploy. Changes to the site and screenshots on the default branch trigger subsequent deployments.
+The project's GitHub Pages source is **Deploy from a branch → main → / (root)**. GitHub builds on pushes to main. The root configuration excludes the application and release documentation from the website while keeping the synthetic screenshots.
+
+If the repository is configured to use GitHub Actions as its Pages source instead, run **Publish project website** from the Actions tab. That workflow packages the static site and selected screenshots.
 
 To preview locally, copy screenshots into the site's asset directory and serve the repository root:
 
